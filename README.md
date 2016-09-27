@@ -9,4 +9,12 @@ with almost all versions, tested at Windows 7 and 10</U></p>
 
 <br>
 Yes, It is not commented. Wasn't thinking about such things when I was learning ASM, and yes, I could have used<br>
-more advanced things like lodsb etc. but I have not considered them usefull then</b>
+more advanced things like lodsb etc. but I have not considered them usefull back then</b>
+
+
+<br>
+Compile:<br>
+fasm snake.asm<br>
+Or using the win32 fasm inbuilt IDE</br>
+
+<b>There is a small bug- sometimes points appear inside snake's body, I haven't fixed it just because I am lazy, but If you do, feel free to commit</b>
