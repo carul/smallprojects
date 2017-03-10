@@ -1,0 +1,275 @@
+<html>
+  <head>
+    <title>Kółko i krzyżyk</title>
+    <meta name="description" content="strona na SI">
+    <meta charset="UTF-8">
+    <script type ="text/javascript" src="jquery.js"></script>
+    <style>
+      @keyframes show{
+        from {height: 0%;}
+        to {height: 50%;}
+      }
+      .field{
+        background-color: #a0a0a0;
+        width: 10%;
+        display: inline-block;
+        position: relative;
+      }
+      .box{
+        border: #3e3e3e 1px solid;
+      }
+      .wrapper{
+        width: 100%;
+        height: 100%;
+        background-color: #fff0ff;
+      }
+      .center{
+        display: table;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .square{
+        border-radius: 0%;
+        background: linear-gradient(to bottom, transparent 45%, #000 45%, #000 55%,  transparent 55%), linear-gradient(to right, transparent 45%, #000 45%, #000 55%, transparent 55%);
+        transform: rotate(45deg);
+      }
+      .circle{
+        border: 0px black solid;
+        border-radius: 50%;
+      }
+      .childsel{
+        width: 80%;
+        height: 80%;
+        margin: auto;
+        position: relative;
+        top: 10%;
+      }
+      .which{
+        background-color: rgba(0, 0, 0, 0.0);
+        z-index: 2;
+        height: 50%;
+        width: 100%;
+        bottom: 0%;
+        position: absolute;
+        animation-duration: 0.5s;
+        animation-iteration-count: 0;
+      }
+      .setx, .seto{
+        opacity: 0;
+        position: absolute;
+        width: 50%;
+        height: 100%;
+        z-index: 10;
+      }
+      .setx{
+        left: 0%;
+      }
+      .seto{
+        left: 50%;
+      }
+      .field:hover >  .which > .setx, .which:hover > .setx{
+        transition: 2s;
+        opacity: 1;
+      }
+      .field:hover >  .which > .seto, .which:hover > .seto{
+        transition: 2s;
+        opacity: 1;
+      }
+      .field:hover >  .which, .which:hover{
+        animation-iteration-count: 1;
+        animation-name: show;
+      }
+      .setx > .square{
+        height: 100%;
+        width: 100%;
+      }
+      .seto > .circle{
+        width: 75%;
+        height: 75%;
+        margin: auto;
+      }
+      .field:hover >  .which, .which:hover{
+        transition: 0.5s;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      #line{
+        display: none;
+        background-color: red;
+        width: 20px;
+        position: fixed;
+      }
+    </style>
+    <script>
+      function rescircles(psiz){
+        $(".circle").each(function(){
+          $(this).css("border-width", psiz*0.04);
+          $(this).css("margin-top", psiz*0.04*0.5);
+          if(!$(this).parent().hasClass("seto")){
+            $(this).css("margin-top", -psiz*0.02);
+          }
+        }); 
+      }
+      function start(){
+        $(".field").each(function(){
+          $(this).append("<div class=\"which\"></div>");
+          $(this).append("<div class=\"childsel\"></div>");
+        });
+        $(".which").each(function(){
+          $(this).append("<div class=\"setx\"></div>");
+          $(this).append("<div class=\"seto\"></div>");
+        });
+        $(".setx").each(function(){
+          $(this).append("<div class=\"square\"></div>");
+        });
+        $(".seto").each(function(){
+          $(this).append("<div class=\"circle\"></div>");
+        });
+        reselems();
+      }
+      $(document).ready(function(){
+        start();
+      });
+      $(window).resize(function(){
+        reselems();
+      });
+      function reselems(){
+        var wwidth = $(window).width();
+        var wheight = $(window).height();
+        var psiz;
+        if(wheight > wwidth)
+          psiz = wwidth;
+        else
+          psiz = wheight;
+        psiz*= 0.3;
+        $(".field").each(function(){
+          $(this).width(psiz);
+          $(this).height(psiz);
+        });
+        $(".field").on("click", ".setx", function(){
+          if(!$(this).parent().hasClass("set")){
+            $(this).parent().addClass("set");
+            $(this).parent().css("display", "none");
+            $(this).parent().parent().children(".childsel").addClass("square");
+            $(this).parent().parent().addClass("X");
+            checkover(psiz);
+          }
+        });
+        $(".field").on("click", ".seto", function(){
+          if(!$(this).parent().hasClass("set")){
+            $(this).parent().addClass("set");
+            $(this).parent().css("display", "none");
+            $(this).parent().parent().children(".childsel").addClass("circle");
+            $(this).parent().parent().addClass("O");
+            rescircles(psiz);
+            checkover(psiz);
+          }
+        });
+        rescircles(psiz);
+      }
+      function checkover(psiz){
+        for(var j = 0; j < 3; j++){
+          var ammo = 0;
+          var ammx = 0;
+          for(var i = 0; i < 3; i++){
+            if($("#f_"+(j*3+i)).hasClass("O"))
+              ammo++;
+            else if($("#f_"+(j*3+i)).hasClass("X"))
+              ammx++;
+          }
+          if(ammx == 3)
+            setline(psiz, j, true, true);
+          if(ammo == 3)
+            setline(psiz, j, true, true);
+        }
+        for(var j = 0; j < 3; j++){
+          var ammo = 0;
+          var ammx = 0;
+          for(var i = 0; i < 3; i++){
+            if($("#f_"+(j+i*3)).hasClass("O"))
+              ammo++;
+            else if($("#f_"+(j+i*3)).hasClass("X"))
+              ammx++;
+            if(ammx == 3)
+              setline(psiz, j, true, false);
+            if(ammo == 3)
+              setline(psiz, j, true, false);
+          }
+        }
+        if(($("#f_0").hasClass("X") && $("#f_4").hasClass("X") && $("#f_8").hasClass("X")) ||
+        ($("#f_0").hasClass("O") && $("#f_4").hasClass("O") && $("#f_8").hasClass("O"))
+        )
+          setline(psiz, 0, false, false);
+
+        if(($("#f_2").hasClass("X") && $("#f_4").hasClass("X") && $("#f_6").hasClass("X")) ||
+        ($("#f_2").hasClass("O") && $("#f_4").hasClass("O") && $("#f_6").hasClass("O"))
+        )
+          setline(psiz, 0, false, true);
+      }
+      function reset(){
+        $(".field").each(function(){
+            $(this).html('');
+        });
+        $("#line").css("display", "none");
+        $(".field").each(function(){
+          $(this).removeClass("X");
+          $(this).removeClass("O");
+        });
+        start();
+      }
+      function setline(psiz, position, straight, hor){
+        $("#line").css("display", "initial");
+        if (typeof(straight)==='undefined') straight = true;
+        if (typeof(hor)==='undefined') hor = false;
+        if(straight){
+          $("#line").css("height", psiz*3-10);
+          if(hor){
+            $("#line").css("transform", "rotate(90deg)");
+            $("#line").css("left", Math.ceil(($("#f_0").position().left) + psiz*3*0.5-5) + "px");
+            $("#line").css("top", ($("#f_0").position().top + psiz*position+psiz*0.5 - (psiz*3-10)/2) + "px");
+          }
+          else{
+            $("#line").css("left", Math.ceil(($("#f_0").position().left + psiz*position+ psiz*0.5)) + "px");
+            $("#line").css("top", ($("#f_0").position().top + psiz*0.32*0.1) + "px");
+            $("#line").css("transform", "none");
+          }
+        }
+        else{
+          $("#line").height(psiz*3*Math.sqrt(2));
+          if(hor){
+            $("#line").css("transform", "rotate(45deg)");
+            $("#line").css("top", -psiz*0.5-10+"px");
+            $("#line").css("left", "45.5%");
+          }
+          else{
+            $("#line").css("transform", "rotate(-45deg)");
+            $("#line").css("top", -psiz*0.5-10+"px");
+            $("#line").css("left", "46.5%");
+          }
+        }
+        $(".which").each(function(){
+          $(this).addClass("set");
+          $(this).css("display", "none");
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <div class="wrapper">
+        <div class="center">
+        <div class="field" id="f_0"></div>
+        <div class="field" id="f_1"></div>
+        <div class="field" id="f_2"></div>
+        <br/>
+        <div class="field" id="f_3"></div>
+        <div class="field" id="f_4"></div>
+        <div class="field" id="f_5"></div>
+        <br/>
+        <div class="field" id="f_6"></div>
+        <div class="field" id="f_7"></div>
+        <div class="field" id="f_8"></div>
+        <input type="button" value="RESET" onclick="reset()">
+        <div id="line"></div>
+      </div>
+    </div>
+  </body>
+</html>
